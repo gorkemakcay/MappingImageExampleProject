@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style>
+    .arlentusImg {
+        height: 720px;
+        width: 1080px;
+    }
+
+    .arlentusCanvas {
+        height: 720px;
+        width: 1080px;
+        border: 3px solid #ff0000;
+    }
+</style>
+
+<body>
+    <canvas id="arlentusCanvas" class="arlentusCanvas"></canvas>
+    <img src="~/img/arlentus.png" id="arlentusImg" height="720" width="1080" hidden />
+    <p id="showCoordinates"></p>
+</body>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+
+@* Canvas Configurations *@
+<script>
+    var canvas = document.getElementById("arlentusCanvas");
+    var contex = canvas.getContext("2d");
+    var img = document.getElementById("arlentusImg");
+    contex.drawImage(img, 0, 0, 300, 150);
+</script>
+
+@* Mouse Coordinates in Canvas *@
+<script>
+    canvas.addEventListener('mousemove', handleMoveEvent, false);
+
+    function handleMoveEvent(event) {
+        var mousePos = getMousePos(canvas, event);
+        var coordinateResult = 'Mouse Coordinates: ' + 'X: ' + mousePos.x + ',' + 'Y: ' + mousePos.y;
+        document.getElementById("showCoordinates").innerHTML = coordinateResult;
+    }
+
+    function getMousePos(canvas, event) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top
+        };
+    }
+</script>
+
+@* Create Rectangle in Canvas *@
+<script>
+
+</script>

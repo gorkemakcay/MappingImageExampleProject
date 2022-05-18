@@ -1,0 +1,155 @@
+﻿<form id="frmItemInformation" autocomplete="off" method="post">
+
+    <div class="card-body" style="display:block;">
+
+        <table id="dataTableStyleDoc" class="table table-hover text-sm table-responsive-sm table-sm">
+            <thead class="no-border" style="background-color:#C9D6DF;color:#1B262C;font-weight:600">
+                <tr>
+                    <th class="text-sm" style="font-weight:500">Report No</th>
+                    <th class="text-sm" style="font-weight:500">Date</th>
+                    <th class="text-sm" style="font-weight:500">Method</th>
+                    <th class="text-sm" style="font-weight:500">Status</th>
+                    <th class="text-sm" style="font-weight:500">Emergent</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (ViewBag.FinalQualityDocumentList != null)
+                {
+                    foreach (var document in ViewBag.FinalQualityDocumentList)
+                    {
+                        <tr>
+                            <td class="text-sm" style="font-weight:400">@document.Name</td>
+                            <td class="text-sm" style="font-weight:400">@document.Description</td>
+                            <td class="text-sm" style="font-weight:400">@document.UploadedBy</td>
+                            <td class="text-sm" style="font-weight:400">@document.FileType</td>
+                            <td class="text-sm" style="font-weight:400">@document.CreatedOn</td>
+                            <td>
+                                <a type="button" class="btn btn-sm" style="border:none;border-radius:0px;color:#364F6B" asp-controller="Document" asp-action="DownloadDocument" asp-route-id="@document.Id" title="İndir"><i class="fas fa-cloud-download-alt"></i></a> &nbsp;&nbsp;
+                                <a type="button" class="btn btn-sm" style="border:none;border-radius:0px;color:#CE2232" asp-controller="Document" asp-action="DeleteDocument" asp-route-id="@document.Id" title="Sil" asp-route-formId="@document.FormId" asp-route-formType="@document.FormType" asp-route-addOrUpdate="update" onclick="return confirm('Bu dosyayı silmek istediğine emin misin?');"><i class="fas fa-trash-alt"></i></a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <a data-toggle="modal" data-target="#AddInspectionData" data-backdrop="static" data-keyboard="false" class="btn btn-sm float-right" style="border:none; background-color:darkslateblue ;color:#ffffff;border-radius:0px">Add</a>
+    </div>
+
+</form>
+
+<form id="frmAddInspectionData" method="post" enctype="multipart/form-data">
+
+    <div class="modal" id="AddInspectionData">
+        <div class="modal-dialog modal-lg" style="top: 30%">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h2 class="modal-title">Inspection Data</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="form-row">
+                        <div class="form-group col-sm-4">
+                            <span style="color: #8F8F95; font-size: 1em; font-weight:500 ">Report No</span>
+                            <input type="text" id="addTagReportNo" class="form-control">
+                        </div>
+
+                        <div class="form-group col-sm-4">
+                            <span style="color: #8F8F95; font-size: 1em; font-weight:500 ">Date</span>
+                            <input type="text" id="addTagDate" class="form-control">
+                        </div>
+
+                        <div class="form-group col-sm-4">
+                            <span style="color: #8F8F95; font-size: 1em; font-weight:500 ">Date Due</span>
+                            <input type="text" id="addTagDateDue" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-sm-6">
+                            <span style="color: #8F8F95; font-size: 1em; font-weight:500 ">Method</span>
+                            <select class="form-control select2bs4 select2-hidden-accessible" id="addTagMethod">
+                                <option>Select</option>
+                                <option>Stone</option>
+                                <option>Pebble</option>
+                                <option>Pumice</option>
+                                <option>Flint</option>
+                                <option>Gravel</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-sm-6">
+                            <span style="color: #8F8F95; font-size: 1em; font-weight:500 ">Procedure</span>
+                            <select class="form-control select2bs4 select2-hidden-accessible" id="addTagProcedure">
+                                <option>Select</option>
+                                <option>Stone</option>
+                                <option>Pebble</option>
+                                <option>Pumice</option>
+                                <option>Flint</option>
+                                <option>Gravel</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-sm-6">
+                            <span style="color: #8F8F95; font-size: 1em; font-weight:500 ">Technique</span>
+                            <select class="form-control select2bs4 select2-hidden-accessible" id="addTagTechnique">
+                                <option>Select</option>
+                                <option>Stone</option>
+                                <option>Pebble</option>
+                                <option>Pumice</option>
+                                <option>Flint</option>
+                                <option>Gravel</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-sm-6">
+                            <span style="color: #8F8F95; font-size: 1em; font-weight:500 ">Status</span>
+                            <select class="form-control select2bs4 select2-hidden-accessible" id="addTagStatus">
+                                <option>Select</option>
+                                <option>Stone</option>
+                                <option>Pebble</option>
+                                <option>Pumice</option>
+                                <option>Flint</option>
+                                <option>Gravel</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-sm-12">
+                            <span style="color: #8F8F95; font-size: 1em; font-weight:500 ">Comments</span>
+                            <textarea id="addTagComments" class="form-control" style="min-height: 40px; width: 100%; max-height: 350px" maxlength="1000" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-sm-2">
+                            <label for="file-upload" style="color: gray; font-weight: 400; border: 1px solid black; padding: 5px;" class="custom-file-upload">
+                                <i style="color:#364F6B;" class="fa fa-cloud-upload"></i> Choose File
+                            </label>
+                            <input id="file-upload" type="file" name="files" hidden />
+                        </div>
+                        <div class="col-sm-10">
+                            <input class="form-control" style="width: 100%; border: 1px solid black; border-radius: 0px; padding: 5px;" type="text" autocomplete="off" placeholder="Description..." name="description" required />
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="float-right">
+                        <button id="btnAddSpecification" type="button" class="btn btn-primary" style="border:none;border-radius:0px">Kaydet</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>

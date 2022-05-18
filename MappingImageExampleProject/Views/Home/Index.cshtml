@@ -1,35 +1,173 @@
-﻿
+﻿<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
+
 <div class="row my-5"></div>
 
 <div class="row">
 
-    <div class="col-md-2 text-center">
-        <button id="btnRectangleTag" type="button" class="btn btn-success" style="border:none; border-radius: 0px"><strong><i>+ &nbsp;</i>Add Rectangle Tag</strong></button>
+    <div class="col-md-2 text-center" style="padding: 0px;">
+        <button id="btnAddRectangleTag" type="button" class="btn btn-success mb-1" style="border:none; border-radius: 0px; width: 80%"><strong><i class="float-left">+ &nbsp;</i>Add Rectangle Tag</strong></button>
+
+        <button id="btnAddLink" type="button" class="btn btn-success mb-1" style="border: none; border-radius: 0px; width: 80%"><strong><i class="float-left">+ &nbsp;</i>Add Link</strong></button>
 
         <div id="currentTags">
             @*<map name="arlentusMap">
-                <area title="hi!" shape="rect" coords="0,0,300,300" href="#">
-            </map>*@
+                    <area title="hi!" shape="rect" coords="0,0,300,300" href="#">
+                </map>*@
         </div>
     </div>
 
-    <div class="col-md-8">
+    <div class="col-md-8" style="padding: 0px;">
         <canvas id="image" width="1080" height="720" style="border: 1px solid black;" hidden></canvas>
         <img class="map" id="arlentusImage" src="~/img/1080x720.jpg" style="width: 1080px; height: 720px;" usemap="#arlentusMap">
     </div>
 
-    <div class="col-md-2">
+    <div class="col-md-2" style="padding: 0px;">
+    </div>
+
+    <div class="modal fade" id="AddSpecificationModal">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h2 class="modal-title">Item [RES1012]</h2>
+
+                    <div class="col-sm-8">
+                        <ul class="nav nav-pills mt-2">
+                            <li class="nav-item"><a class="nav-link active" style="border:none;border-radius:0px" href="#information" data-toggle="tab">Item Information</a></li>
+
+                            <li class="nav-item"><a class="nav-link" style="border:none;border-radius:0px" href="#attachments" data-toggle="tab">Attachments</a></li>
+
+                            <li class="nav-item"><a class="nav-link" style="border:none;border-radius:0px" href="#inspections" data-toggle="tab">Inspections</a></li>
+                        </ul>
+                    </div>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="information">
+                            @await Html.PartialAsync("ItemInformation")
+                        </div>
+                        <div class="tab-pane" id="attachments">
+                            @await Html.PartialAsync("Attachments")
+                        </div>
+                        <div class="tab-pane" id="inspections">
+                            @await Html.PartialAsync("Inspections")
+                        </div>
+                    </div>
+                   
+                </div>
+
+            </div>
+        </div>
     </div>
 
 </div>
 
 @section Scripts {
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    @*<script src="~/js/jquery.maphilight.min.js"></script>*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script>
     <script src="~/js/maphilight.js"></script>
     <script>
+
         $(function () {
-            //variables
+            $("#AddSpecificationModal").on('show.bs.modal', function () {
+                document.getElementById('frmAddSpecification').reset();
+            });
+        });
+
+        $(function () {
+
+            // right click menu
+            $.contextMenu({
+                selector: '.right-click-menu',
+                items: {
+                    // <input type="text">
+                    name: {
+                        name: "Title",
+                        type: 'text',
+                        events: {
+                            keyup: function (e) {
+                                // add some fancy key handling here?
+                                window.console && console.log('key: ' + e.keyCode);
+                            }
+                        }
+                    },
+                    sep1: "---------",
+                    // <input type="checkbox">
+                    yesno: {
+                        name: "Process Completed!",
+                        type: 'checkbox',
+                        selected: true
+                    },
+                    sep2: "---------",
+                    // <input type="radio">
+                    radio1: {
+                        name: "True",
+                        type: 'radio',
+                        radio: 'radio',
+                        value: '1'
+                    },
+                    radio2: {
+                        name: "False",
+                        type: 'radio',
+                        radio: 'radio',
+                        value: '2',
+                        selected: true
+                    },
+                    sep3: "---------",
+                    // <select>
+                    select: {
+                        name: "Select",
+                        type: 'select',
+                        options: { 1: 'one', 2: 'two', 3: 'three' },
+                        selected: 2
+                    },
+                    // <textarea>
+                    area1: {
+                        name: "Defination",
+                        type: 'textarea',
+                        value: "Hello World",
+                        height: 20
+                    },
+                    area2: {
+                        name: "Description",
+                        type: 'textarea',
+                        value: "Hello World",
+                        height: 40
+                    },
+                    sep4: "---------",
+                    key: {
+                        name: "Save",
+                        callback: $.noop
+                    }
+                },
+                events: {
+                    show: function (opt) {
+                        // this is the trigger element
+                        var $this = this;
+                        // import states from data store
+                        $.contextMenu.setInputValues(opt, $this.data());
+                        // this basically fills the input commands from an object
+                        // like {name: "foo", yesno: true, radio: "3", &hellip;}
+                    },
+                    hide: function (opt) {
+                        // this is the trigger element
+                        var $this = this;
+                        // export states to data store
+                        $.contextMenu.getInputValues(opt, $this.data());
+                        // this basically dumps the input commands' values to an object
+                        // like {name: "foo", yesno: true, radio: "3", &hellip;}
+                    }
+                }
+            });
+
+            // variables
             var mousedown = false;
             var x1;
             var y1;
@@ -38,20 +176,20 @@
             var canvas = document.getElementById("image")
             var context = canvas.getContext("2d");
             var img = document.getElementById("arlentusImage");
-            context.drawImage(img, 0, 0);
             var isRectExist = false;
             var rectCoords = [];
             var currentRectCount = 0;
             var currentMapCount = 0;
             var imgMap;
 
-            //add rectangle tag button
-            $("#btnRectangleTag").click(function () {
+            context.drawImage(img, 0, 0);
+            // add rectangle tag button
+            $("#btnAddRectangleTag").click(function () {
                 document.getElementById("arlentusImage").setAttribute("hidden", "");
                 document.getElementById("image").removeAttribute("hidden");
                 isRectExist = false
 
-                //mouse events
+                // mouse events
                 document.getElementById("image").onmousedown = function (e) {
                     if (!isRectExist) {
                         mousedown = true;
@@ -75,12 +213,17 @@
                         rectCoords[currentRectCount] = rectModel;
                         if (currentMapCount == 0) {
                             imgMap = $('<map>', {
-                                'name': 'arlentusMap'
+                                'name': 'arlentusMap',
+                                'class': 'right-click-menu'
                             }).append($('<area>', {
                                 'shape': 'rect',
-                                'title': 'arlentus',
+                                'title': 'tag' + (currentRectCount + 1),
                                 'coords': rectCoords[currentRectCount],
-                                'href': 'http://www.google.com'
+                                'href': '',
+                                'data-toggle': 'modal',
+                                'data-target': '#AddSpecificationModal',
+                                'data-backdrop': 'static',
+                                'data-keyboard': 'false'
                             }));
                             $("#currentTags").append(imgMap);
                             currentMapCount++;
@@ -88,22 +231,26 @@
                         else {
                             var imgMapArea = $('<area>', {
                                 'shape': 'rect',
-                                'title': 'arlentus',
+                                'title': 'tag' + (currentRectCount + 1),
                                 'coords': rectCoords[currentRectCount],
-                                'href': 'http://www.google.com'
+                                'href': '',
+                                'data-toggle': 'modal',
+                                'data-target': '#AddSpecificationModal',
+                                'data-backdrop': 'static',
+                                'data-keyboard': 'false'
                             });
-                            imgMap.append(imgMapArea); // bu satırda kod duruyor!
+                            imgMap.append(imgMapArea);
                             currentMapCount++;
                         }
+                        $('.map').maphilight();
                         mousedown = false;
                         currentRectCount++;
                         document.getElementById("image").setAttribute("hidden", "");
                         document.getElementById("arlentusImage").removeAttribute("hidden");
-                        $('.map').maphilight();
                     }
                 }
 
-                //functions
+                // functions
                 function drawRect() {
                     context.clearRect(0, 0, 1080, 720);
                     context.drawImage(img, 0, 0);
@@ -113,8 +260,12 @@
                 }
             });
 
-            $('.map').maphilight();
+            // add link button [TAMAMLANMADI!]
+            $("#btnAddLink").click(function () {
 
+            });
+
+            $('.map').maphilight();
         });
     </script>
 }

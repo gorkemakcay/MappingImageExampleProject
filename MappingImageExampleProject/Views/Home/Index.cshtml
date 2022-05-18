@@ -1,57 +1,120 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿
+<div class="row my-5"></div>
+
+<div class="row">
+
+    <div class="col-md-2 text-center">
+        <button id="btnRectangleTag" type="button" class="btn btn-success" style="border:none; border-radius: 0px"><strong><i>+ &nbsp;</i>Add Rectangle Tag</strong></button>
+
+        <div id="currentTags">
+            @*<map name="arlentusMap">
+                <area title="hi!" shape="rect" coords="0,0,300,300" href="#">
+            </map>*@
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <canvas id="image" width="1080" height="720" style="border: 1px solid black;" hidden></canvas>
+        <img class="map" id="arlentusImage" src="~/img/1080x720.jpg" style="width: 1080px; height: 720px;" usemap="#arlentusMap">
+    </div>
+
+    <div class="col-md-2">
+    </div>
+
+</div>
+
+@section Scripts {
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    @*<script src="~/js/jquery.maphilight.min.js"></script>*@
+    <script src="~/js/maphilight.js"></script>
+    <script>
+        $(function () {
+            //variables
+            var mousedown = false;
+            var x1;
+            var y1;
+            var x2;
+            var y2;
+            var canvas = document.getElementById("image")
+            var context = canvas.getContext("2d");
+            var img = document.getElementById("arlentusImage");
+            context.drawImage(img, 0, 0);
+            var isRectExist = false;
+            var rectCoords = [];
+            var currentRectCount = 0;
+            var currentMapCount = 0;
+            var imgMap;
+
+            //add rectangle tag button
+            $("#btnRectangleTag").click(function () {
+                document.getElementById("arlentusImage").setAttribute("hidden", "");
+                document.getElementById("image").removeAttribute("hidden");
+                isRectExist = false
+
+                //mouse events
+                document.getElementById("image").onmousedown = function (e) {
+                    if (!isRectExist) {
+                        mousedown = true;
+                        x1 = e.offsetX;
+                        y1 = e.offsetY;
+                    }
+                }
+
+                document.getElementById("image").onmousemove = function (e) {
+                    if (mousedown) {
+                        x2 = e.offsetX;
+                        y2 = e.offsetY;
+                        drawRect()
+                    }
+                }
+
+                document.getElementById("image").onmouseup = function (e) {
+                    if (mousedown) {
+                        isRectExist = true;
+                        var rectModel = x1 + "," + y1 + "," + x2 + "," + y2;
+                        rectCoords[currentRectCount] = rectModel;
+                        if (currentMapCount == 0) {
+                            imgMap = $('<map>', {
+                                'name': 'arlentusMap'
+                            }).append($('<area>', {
+                                'shape': 'rect',
+                                'title': 'arlentus',
+                                'coords': rectCoords[currentRectCount],
+                                'href': 'http://www.google.com'
+                            }));
+                            $("#currentTags").append(imgMap);
+                            currentMapCount++;
+                        }
+                        else {
+                            var imgMapArea = $('<area>', {
+                                'shape': 'rect',
+                                'title': 'arlentus',
+                                'coords': rectCoords[currentRectCount],
+                                'href': 'http://www.google.com'
+                            });
+                            imgMap.append(imgMapArea); // bu satırda kod duruyor!
+                            currentMapCount++;
+                        }
+                        mousedown = false;
+                        currentRectCount++;
+                        document.getElementById("image").setAttribute("hidden", "");
+                        document.getElementById("arlentusImage").removeAttribute("hidden");
+                        $('.map').maphilight();
+                    }
+                }
+
+                //functions
+                function drawRect() {
+                    context.clearRect(0, 0, 1080, 720);
+                    context.drawImage(img, 0, 0);
+                    context.beginPath();
+                    context.rect(x1, y1, (x2 - x1), (y2 - y1));
+                    context.stroke();
+                }
+            });
+
+            $('.map').maphilight();
+
+        });
+    </script>
 }
-
-<style>
-    .arlentusImg {
-        height: 720px;
-        width: 1080px;
-    }
-
-    .arlentusCanvas {
-        height: 720px;
-        width: 1080px;
-        border: 3px solid #ff0000;
-    }
-</style>
-
-<body>
-    <canvas id="arlentusCanvas" class="arlentusCanvas"></canvas>
-    <img src="~/img/arlentus.png" id="arlentusImg" height="720" width="1080" hidden />
-    <p id="showCoordinates"></p>
-</body>
-
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
-
-@* Canvas Configurations *@
-<script>
-    var canvas = document.getElementById("arlentusCanvas");
-    var contex = canvas.getContext("2d");
-    var img = document.getElementById("arlentusImg");
-    contex.drawImage(img, 0, 0, 300, 150);
-</script>
-
-@* Mouse Coordinates in Canvas *@
-<script>
-    canvas.addEventListener('mousemove', handleMoveEvent, false);
-
-    function handleMoveEvent(event) {
-        var mousePos = getMousePos(canvas, event);
-        var coordinateResult = 'Mouse Coordinates: ' + 'X: ' + mousePos.x + ',' + 'Y: ' + mousePos.y;
-        document.getElementById("showCoordinates").innerHTML = coordinateResult;
-    }
-
-    function getMousePos(canvas, event) {
-        var rect = canvas.getBoundingClientRect();
-        return {
-            x: event.clientX - rect.left,
-            y: event.clientY - rect.top
-        };
-    }
-</script>
-
-@* Create Rectangle in Canvas *@
-<script>
-
-</script>

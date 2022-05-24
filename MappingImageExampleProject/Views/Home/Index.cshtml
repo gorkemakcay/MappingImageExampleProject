@@ -1,13 +1,36 @@
 ﻿<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
 
+<style>
+    area:link, area:hover, area:active, area:focus {
+        border: 10px #f00 solid;
+        border-radius: 0px;
+        width: 80%;
+    }
+</style>
+
+
 <div class="row my-5"></div>
 
 <div class="row">
 
-    <div class="col-md-2 text-center" style="padding: 0px;">
-        <button id="btnAddRectangleTag" type="button" class="btn btn-success mb-1" style="border:none; border-radius: 0px; width: 80%"><strong><i class="float-left">+ &nbsp;</i>Add Rectangle Tag</strong></button>
+    <div class=" col-md-2 text-center" style="padding: 0px;">
+        <div class="dropdown">
+            <button id="item" type="button" class="btn btn-info mb-1 dropdown-toggle" style="border:none; border-radius: 0px; width: 80%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><strong><i class="float-left">+ &nbsp;</i>Add Item</strong></button>
 
-        <button id="btnAddLink" type="button" class="btn btn-success mb-1" style="border: none; border-radius: 0px; width: 80%"><strong><i class="float-left">+ &nbsp;</i>Add Link</strong></button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <button id="btnAddRectangleTag" type="button" class="dropdown-item btn btn-success mb-1" style="border:none; border-radius: 0px; width: 80%;"><strong><i class="float-left">+ &nbsp;</i>Rectangle</strong></button>
+                <button id="btnAddPolygonTag" type="button" class="dropdown-item btn btn-success mb-1" style="border: none; border-radius: 0px; width: 80%;"><strong><i class="float-left">+ &nbsp;</i>Polygon</strong></button>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button id="link" type="button" class="btn btn-info mb-1 dropdown-toggle" style="border:none; border-radius: 0px; width: 80%;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><strong><i class="float-left">+ &nbsp;</i>Add Link</strong></button>
+
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <button id="btnAddRectangleLink" type="button" class="dropdown-item btn btn-success mb-1" style="border:none; border-radius: 0px; width: 80%;"><strong><i class="float-left">+ &nbsp;</i>Rectangle</strong></button>
+                <button id="btnAddPolygonLink" type="button" class="dropdown-item btn btn-success mb-1" style="border: none; border-radius: 0px; width: 80%;"><strong><i class="float-left">+ &nbsp;</i>Polygon</strong></button>
+            </div>
+        </div>
 
         <div id="currentTags">
             @*<map name="arlentusMap">
@@ -17,13 +40,15 @@
     </div>
 
     <div class="col-md-8" style="padding: 0px;">
-        <canvas id="image" width="1080" height="720" style="border: 1px solid black;" hidden></canvas>
+        <canvas id="image" width="1080" height="720" style="border: 2px solid black; border-style: dashed;" hidden></canvas>
         <img class="map" id="arlentusImage" src="~/img/1080x720.jpg" style="width: 1080px; height: 720px;" usemap="#arlentusMap">
     </div>
 
     <div class="col-md-2" style="padding: 0px;">
+
     </div>
 
+    @* TAG MODAL *@
     <div class="modal fade" id="AddSpecificationModal">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -50,16 +75,38 @@
 
                     <div class="tab-content">
                         <div class="active tab-pane" id="information">
-                            @await Html.PartialAsync("ItemInformation")
+                            @await Html.PartialAsync("ItemInformationPartial")
                         </div>
                         <div class="tab-pane" id="attachments">
-                            @await Html.PartialAsync("Attachments")
+                            @await Html.PartialAsync("AttachmentsPartial")
                         </div>
                         <div class="tab-pane" id="inspections">
-                            @await Html.PartialAsync("Inspections")
+                            @await Html.PartialAsync("InspectionsPartial")
                         </div>
                     </div>
-                   
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    @* LINK MODAL *@
+    <div class="modal " id="AddSpecificationModal">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h2 class="modal-title">Item [LINK1019]</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                  
+
                 </div>
 
             </div>
@@ -73,17 +120,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script>
     <script src="~/js/maphilight.js"></script>
-    <script>
+    @*<script sr c="~/js/wheelzoom.js"></script>*@
+    @*wheelzoom(document.querySelectorAll('img'));*@
 
+    <script>
         $(function () {
+
+            ///////////////////////////////////////////////////////////////////////////////////////////// [GENERAL VARIABLES]
+            var canvas = document.getElementById("image")
+            var context = canvas.getContext("2d");
+            var img = document.getElementById("arlentusImage");
+            var currentMapCount = 0;
+            var imgMap;
+            context.drawImage(img, 0, 0);
+
+            ///////////////////////////////////////////////////////////////////////////////////////////// [ADD TAG]
             $("#AddSpecificationModal").on('show.bs.modal', function () {
                 document.getElementById('frmAddSpecification').reset();
             });
-        });
 
-        $(function () {
 
-            // right click menu
+
+            /////////////////////////////////////////////////////////////// [RIGHT CLICK MENU]
             $.contextMenu({
                 selector: '.right-click-menu',
                 items: {
@@ -167,30 +225,173 @@
                 }
             });
 
-            // variables
+            /////////////////////////////////////////////////////////////// [ADD POLYGON TAG BUTTON]
+            var currentPolyCoords = [];
+            var currentPolyCount = 0;
+            var isPolyActive = false;
+            var polyPoints = [];
+
+            $("#btnAddPolygonTag").click(function () {
+                polyPoints.length = 0;
+                isPolyActive = true;
+                img.setAttribute("hidden", "");
+                canvas.removeAttribute("hidden");
+
+                canvas.onmousedown = function (e) {
+                    polyPoints.push({
+                        x: e.offsetX,
+                        y: e.offsetY
+                    });
+                    redraw();
+                }
+
+                // When Pressed "ESC"
+                document.addEventListener('keydown', e => {
+                    if (e.key == 'Escape' && isPolyActive == true) {
+                        if (polyPoints.length > 2) {
+                            isPolyActive = false;
+                            var polyCoords = polyPoints[0].x + "," + polyPoints[0].y + " ";
+                            for (var i = 1; i < polyPoints.length; i++) {
+                                polyCoords += polyPoints[i].x + "," + polyPoints[i].y + " ";
+                            }
+                            currentPolyCoords[currentPolyCount] = polyCoords;
+                            polyCoords = 0;
+                            if (currentMapCount == 0) {
+                                imgMapButton = $('<button>', {
+                                    'id': 'poly' + (currentPolyCount + 1) + 'Button',
+                                    'type': 'button',
+                                    'class': 'btn btn-danger mb-1',
+                                    'style': 'border:none; border-radius: 0px; width: 80%;',
+                                    'data-toggle': 'modal',
+                                    'data-target': '#AddSpecificationModal',
+                                    'data-backdrop': 'static',
+                                    'data-keyboard': 'false'
+                                });
+                                imgMapButton.text('Polygon Tag' + " " + (currentPolyCount + 1));
+
+                                imgMap = $('<map>', {
+                                    'name': 'arlentusMap',
+                                    'class': 'right-click-menu'
+                                }).append($('<area>', {
+                                    'id': 'poly' + (currentPolyCount + 1),
+                                    'shape': 'poly',
+                                    'title': 'polyTag' + (currentPolyCount + 1),
+                                    'coords': currentPolyCoords[currentPolyCount],
+                                    'href': '',
+                                    'data-toggle': 'modal',
+                                    'data-target': '#AddSpecificationModal',
+                                    'data-backdrop': 'static',
+                                    'data-keyboard': 'false'
+                                }));
+                                $("#currentTags").append($('<br>'));
+                                $("#currentTags").append(imgMap);
+                                $("#currentTags").append($('<br>'));
+                                $("#currentTags").append($('<br>'));
+                                $("#currentTags").append(imgMapButton);
+                                $("#currentTags").append($('<br>'));
+                                currentMapCount++;
+                            }
+                            else {
+                                var imgMapButton = $('<button>', {
+                                    'id': 'poly' + (currentPolyCount + 1) + 'Button',
+                                    'type': 'button',
+                                    'class': 'btn btn-danger mb-1',
+                                    'style': 'border:none; border-radius: 0px; width: 80%;',
+                                    'data-toggle': 'modal',
+                                    'data-target': '#AddSpecificationModal',
+                                    'data-backdrop': 'static',
+                                    'data-keyboard': 'false'
+                                });
+                                imgMapButton.text('Polygon Tag' + " " + (currentPolyCount + 1));
+
+                                var imgMapArea = $('<area>', {
+                                    'id': 'poly' + (currentPolyCount + 1),
+                                    'shape': 'poly',
+                                    'title': 'polyTag' + (currentPolyCount + 1),
+                                    'coords': currentPolyCoords[currentPolyCount],
+                                    'href': '',
+                                    'data-toggle': 'modal',
+                                    'data-target': '#AddSpecificationModal',
+                                    'data-backdrop': 'static',
+                                    'data-keyboard': 'false'
+                                });
+                                $("#currentTags").append(imgMapButton);
+                                imgMap.append(imgMapArea);
+                                $("#currentTags").append($('<br>'));
+                                currentMapCount++;
+                            }
+                            $('.map').maphilight();
+                            currentPolyCount++;
+                            canvas.setAttribute("hidden", "");
+                            img.removeAttribute("hidden");
+                        }
+                        else {
+                            $('.map').maphilight();
+                            canvas.setAttribute("hidden", "");
+                            img.removeAttribute("hidden");
+                        }
+                    }
+                });
+
+                // polygon funtions
+                function redraw() {
+                    canvas.width = canvas.width // clears the canvas
+                    context.drawImage(img, 0, 0);
+
+                    drawPolygon();
+                    drawPoints();
+                }
+
+                function drawPolygon() {
+                    context.fillStyle = 'rgba(100, 100, 100, 0.5)';
+                    context.strokeStyle = "#df4b26";
+                    context.lineWidth = 1;
+
+                    context.beginPath();
+                    context.moveTo(polyPoints[0].x, polyPoints[0].y);
+
+                    for (var i = 1; i < polyPoints.length; i++) {
+                        context.lineTo(polyPoints[i].x, polyPoints[i].y);
+                    }
+
+                    context.closePath();
+                    context.fill();
+                    context.stroke();
+                }
+
+                function drawPoints() {
+                    context.strokeStyle = "#000";
+                    context.lineJoin = "round";
+                    context.lineWidth = 1;
+
+                    for (var i = 0; i < polyPoints.length; i++) {
+                        context.beginPath();
+                        context.arc(polyPoints[i].x, polyPoints[i].y, 3, 0, 2 * Math.PI, false);
+                        context.fillStyle = '#ffffff';
+                        context.fill();
+                        context.lineWidth = 2;
+                        context.stroke();
+                    }
+                }
+            });
+
+            /////////////////////////////////////////////////////////////// [ADD RECTANGLE TAG BUTTON]
+            var currentRectCount = 0;
+            var isRectExist = false;
             var mousedown = false;
+            var rectCoords = [];
             var x1;
             var y1;
             var x2;
             var y2;
-            var canvas = document.getElementById("image")
-            var context = canvas.getContext("2d");
-            var img = document.getElementById("arlentusImage");
-            var isRectExist = false;
-            var rectCoords = [];
-            var currentRectCount = 0;
-            var currentMapCount = 0;
-            var imgMap;
 
-            context.drawImage(img, 0, 0);
-            // add rectangle tag button
             $("#btnAddRectangleTag").click(function () {
-                document.getElementById("arlentusImage").setAttribute("hidden", "");
-                document.getElementById("image").removeAttribute("hidden");
+                img.setAttribute("hidden", "");
+                canvas.removeAttribute("hidden");
                 isRectExist = false
 
                 // mouse events
-                document.getElementById("image").onmousedown = function (e) {
+                canvas.onmousedown = function (e) {
                     if (!isRectExist) {
                         mousedown = true;
                         x1 = e.offsetX;
@@ -198,7 +399,7 @@
                     }
                 }
 
-                document.getElementById("image").onmousemove = function (e) {
+                canvas.onmousemove = function (e) {
                     if (mousedown) {
                         x2 = e.offsetX;
                         y2 = e.offsetY;
@@ -206,18 +407,31 @@
                     }
                 }
 
-                document.getElementById("image").onmouseup = function (e) {
+                canvas.onmouseup = function (e) {
                     if (mousedown) {
                         isRectExist = true;
                         var rectModel = x1 + "," + y1 + "," + x2 + "," + y2;
                         rectCoords[currentRectCount] = rectModel;
                         if (currentMapCount == 0) {
+                            imgMapButton = $('<button>', {
+                                'id': 'rect' + (currentRectCount + 1) + 'Button',
+                                'type': 'button',
+                                'class': 'btn btn-danger mb-1',
+                                'style': 'border:none; border-radius: 0px; width: 80%;',
+                                'data-toggle': 'modal',
+                                'data-target': '#AddSpecificationModal',
+                                'data-backdrop': 'static',
+                                'data-keyboard': 'false'
+                            });
+                            imgMapButton.text('Rectangle Tag' + " " + (currentRectCount + 1));
+
                             imgMap = $('<map>', {
                                 'name': 'arlentusMap',
                                 'class': 'right-click-menu'
                             }).append($('<area>', {
+                                'id': 'rect' + (currentRectCount + 1),
                                 'shape': 'rect',
-                                'title': 'tag' + (currentRectCount + 1),
+                                'title': 'rectTag' + (currentRectCount + 1),
                                 'coords': rectCoords[currentRectCount],
                                 'href': '',
                                 'data-toggle': 'modal',
@@ -225,13 +439,30 @@
                                 'data-backdrop': 'static',
                                 'data-keyboard': 'false'
                             }));
+                            $("#currentTags").append($('<br>'));
                             $("#currentTags").append(imgMap);
+                            $("#currentTags").append($('<br>'));
+                            $("#currentTags").append($('<br>'));
+                            $("#currentTags").append(imgMapButton);
                             currentMapCount++;
                         }
                         else {
+                            imgMapButton = $('<button>', {
+                                'id': 'rect' + (currentPolyCount + 1) + 'Button',
+                                'type': 'button',
+                                'class': 'btn btn-danger mb-1',
+                                'style': 'border:none; border-radius: 0px; width: 80%;',
+                                'data-toggle': 'modal',
+                                'data-target': '#AddSpecificationModal',
+                                'data-backdrop': 'static',
+                                'data-keyboard': 'false'
+                            });
+                            imgMapButton.text('Rectangle Tag' + " " + (currentRectCount + 1));
+
                             var imgMapArea = $('<area>', {
+                                'id': 'rect' + (currentRectCount + 1),
                                 'shape': 'rect',
-                                'title': 'tag' + (currentRectCount + 1),
+                                'title': 'rectTag' + (currentRectCount + 1),
                                 'coords': rectCoords[currentRectCount],
                                 'href': '',
                                 'data-toggle': 'modal',
@@ -239,19 +470,22 @@
                                 'data-backdrop': 'static',
                                 'data-keyboard': 'false'
                             });
+                            $("#currentTags").append(imgMapButton);
                             imgMap.append(imgMapArea);
+                            $("#currentTags").append($('<br>'));
                             currentMapCount++;
                         }
                         $('.map').maphilight();
                         mousedown = false;
                         currentRectCount++;
-                        document.getElementById("image").setAttribute("hidden", "");
-                        document.getElementById("arlentusImage").removeAttribute("hidden");
+                        canvas.setAttribute("hidden", "");
+                        img.removeAttribute("hidden");
                     }
                 }
 
                 // functions
                 function drawRect() {
+                    context.lineWidth = 1;
                     context.clearRect(0, 0, 1080, 720);
                     context.drawImage(img, 0, 0);
                     context.beginPath();
@@ -260,12 +494,18 @@
                 }
             });
 
-            // add link button [TAMAMLANMADI!]
-            $("#btnAddLink").click(function () {
+            ///////////////////////////////////////////////////////////////////////////////////////////// [ADD LINK]
+
+            /////////////////////////////////////////////////////////////// [ADD RECTANGLE TAG BUTTON]
+            $("#btnAddPolygonLink").click(function () {
 
             });
 
-            $('.map').maphilight();
+            /////////////////////////////////////////////////////////////// [ADD RECTANGLE TAG BUTTON]
+            $("#btnAddRectangleLink").click(function () {
+
+            });
+
         });
     </script>
 }
